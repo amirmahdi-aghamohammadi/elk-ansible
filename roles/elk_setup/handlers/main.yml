@@ -1,0 +1,12 @@
+---
+- name: Rebuild_elk
+  community.docker.docker_compose_v2:
+    project_src: "{{ elk_dir }}"
+    state: restarted
+
+# ---
+# - name: rebuild_elk
+#  community.docker.docker_compose_v2:
+#    project_src: "{{ elk_dir }}"
+#    state: present
+#    recreate: always

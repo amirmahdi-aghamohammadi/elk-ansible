@@ -1,0 +1,11 @@
+---
+- name: Setup ELK Stack with Docker using Ansible
+  hosts: elk
+  become: true
+  vars_files:
+    - group_vars/all.yml
+    - vault/secrets.yml
+  roles:
+    - docker_install
+    - elk_setup
+    - elk_restart

@@ -1,0 +1,6 @@
+---
+- name: Rebuild ELK containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ elk_dir }}"
+    state: restarted
+  when: rebuild_on_change

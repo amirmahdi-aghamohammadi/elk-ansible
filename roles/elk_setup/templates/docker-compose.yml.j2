@@ -1,0 +1,62 @@
+version: '3'
+services:
+  elasticsearch:
+    image: {{ elasticsearch_image }}
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD={{ elastic_password }}
+      - "ES_JAVA_OPTS={{ elasticsearch_java_opts }}"
+    volumes:
+      - ./elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - {{ elasticsearch_port }}:9200
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u elastic:{{ elastic_password }} -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    networks:
+      - monitoring-stack-net
+  logstash:
+    image: {{ logstash_image }}
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    ports:
+      - {{ logstash_port }}:8080
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9600/_node/stats/pipelines || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    networks:
+      - monitoring-stack-net
+    depends_on:
+      - elasticsearch
+  kibana:
+    image: {{ kibana_image }}
+    container_name: kibana
+    ports:
+      - {{ kibana_port }}:5601
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD={{ elastic_password }}
+      - SERVER_PUBLICBASEURL={{ kibana_public_base_url }}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u elastic:{{ elastic_password }} -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    networks:
+      - monitoring-stack-net
+    depends_on:
+      - elasticsearch
+networks:
+  monitoring-stack-net:
+    driver: bridge

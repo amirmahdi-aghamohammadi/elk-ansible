@@ -1,0 +1,12 @@
+elk_dir: /opt/elk
+elasticsearch_data_dir: "{{ elk_dir }}/elasticsearch-data"
+logstash_pipeline_dir: "{{ elk_dir }}/logstash/pipeline"
+elasticsearch_image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+logstash_image: docker.elastic.co/logstash/logstash:7.17.0
+kibana_image: docker.elastic.co/kibana/kibana:7.17.0
+elasticsearch_port: 9200
+logstash_port: 8080
+kibana_port: 5601
+elasticsearch_java_opts: "-Xms1g -Xmx1g"
+kibana_public_base_url: "https://domain.com"
+rebuild_on_change: true
